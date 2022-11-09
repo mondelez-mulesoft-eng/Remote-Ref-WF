@@ -1,8 +1,0 @@
-api:
-  keystore:
-    path: "certs/nonprod-keystore.jks"
-    password: "![5Tr3Etof6/qjvl73Vjr5iw==]"
-    keypassword: "![5Tr3Etof6/qjvl73Vjr5iw==]"
-  truststore:
-    path: "certs/nonprod-truststore.jks"
-    password: "![5Tr3Etof6/qjvl73Vjr5iw==]"
