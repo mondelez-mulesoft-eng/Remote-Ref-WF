@@ -13,7 +13,7 @@ http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/sc
 		<anypoint-mq:connection url="${UKI.mq.url}" clientId="${secure::UKI.mq.clientid}" clientSecret="${secure::UKI.mq.clientsecret}" />
 	</anypoint-mq:config>
 	<configuration-properties doc:name="Configuration properties" doc:id="cc1526e1-f979-4c0d-9b7a-19606b8302cb" file="properties/${mule.env}.properties" />
-	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="30772ba1-866b-4c66-ba12-3f355f5651a8" file="properties/secure/secure-${mule.env}.properties" key="${encryption.key}" />
+	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="30772ba1-866b-4c66-ba12-3f355f5651a8" file="properties/secure/secure-${mule.env}.properties" key="${mule.vault.key}" />
 	<sap:sap-config name="SAP_Config_MS_UKI" doc:name="SAP Config_MS_NA" doc:id="3c652ea6-8ca2-4a2f-ad90-5a372e1ca6ae" >
         <sap:simple-connection-provider-connection username="${UKI.sap.username}" password="${secure::UKI.sap.password}" systemNumber="${UKI.sap.system.number}" client="${UKI.sap.clientid}">
             <reconnection >
