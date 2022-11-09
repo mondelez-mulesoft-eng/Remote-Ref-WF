@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+	xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd">
+	
+	<!-- Load Properties -->
+	<configuration-properties doc:name="config-props-common"
+		doc:id="cf3591a2-1d82-4f95-a006-b5d43842c622"
+		file="config/mule-config-common.yaml" />	
+		
+	<configuration-properties doc:name="config-props-env"
+		doc:id="bf6ac983-5d45-4c6c-a9ab-1f516728fa89"
+		file="config/mule-config-${mule.env}.yaml" />
+
+	<!-- Load Secure Properties -->
+	<secure-properties:config name="secure-props-common"
+		doc:name="secure-props-common"
+		doc:id="f6a0115d-5c9f-42a0-bcaf-78b1a63c80ab"
+		file="config/mule-config-common.yaml"
+		key="${encryption.key}" />
+	  
+	<secure-properties:config name="secure-props-env"
+		doc:name="secure-props-env"
+		doc:id="428cfacb-f4f6-4f9d-b895-3b8f367b1b3b"
+		file="config/mule-config-${mule.env}.yaml"
+		key="${encryption.key}" />
+
+	<!-- TLS Context -->
+	<tls:context name="api-listener-tls">
+		<tls:key-store path="${api.keystore.path}"
+			password="${secure::api.keystore.password}"
+			keyPassword="${secure::api.keystore.keypassword}"
+			type="jks" />
+	</tls:context>
+
+	<tls:context name="api-requester-tls">
+		<tls:trust-store path="${api.truststore.path}"
+			password="${secure::api.truststore.password}"
+			insecure="${api.truststore.insecure}" />
+	</tls:context>
+	
+</mule>

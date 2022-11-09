@@ -1,0 +1,24 @@
+name: Build and Deploy to Cloud Hub
+
+on:
+  push:
+    branches: [ develop, test, release, main ]
+  workflow_dispatch:
+    
+jobs:
+      
+  eu-build-and-deploy:
+    uses: mondelez-mulesoft-eng/common-scripts/.github/workflows/workflow_integrationservices.yml@develop
+    with:
+      region: eu-central-1
+      workers: 1
+      worker_type: MICRO
+    secrets:
+      "mule_nexus_username": ${{ secrets.mule_nexus_username }}
+      "mule_nexus_password": ${{ secrets.mule_nexus_password }}
+      "connected_app_client_id": ${{ secrets.connected_app_client_id }}
+      "connected_app_client_secret": ${{ secrets.connected_app_client_secret }}
+      "connected_app_granttype": ${{ secrets.connected_app_granttype }}
+      "mule_env_dev_id": ${{ secrets.mule_env_dev_id }}
+      "mule_env_dev_secret": ${{ secrets.mule_env_dev_secret }}
+      "decryption_key": ${{ secrets.decryption_key }}

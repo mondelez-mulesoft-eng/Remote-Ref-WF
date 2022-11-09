@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:tracing="http://www.mulesoft.org/schema/mule/tracing"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/tracing http://www.mulesoft.org/schema/mule/tracing/current/mule-tracing.xsd">
+	
+	<error-handler name="private-errorhandler">
+		<on-error-propagate type="CONNECTIVITY" logException="true" enableNotifications="true">
+			<set-variable variableName="httpStatus" value="504" doc:name="HTTP Status = 504" />
+			<flow-ref name="handle-private-error" doc:name="handle-private-error" />
+		</on-error-propagate>
+		<on-error-propagate type="SECURITY" logException="true" enableNotifications="true">
+			<choice>
+				<when expression="#[error.errorType.identifier == 'UNAUTHORIZED']">
+					<set-variable variableName="httpStatus" value="401" doc:name="HTTP Status = 401" />
+				</when>
+				<otherwise>
+					<set-variable variableName="httpStatus" value="403" doc:name="HTTP Status = 403" />
+				</otherwise>
+			</choice>
+			<flow-ref name="handle-private-error" doc:name="handle-private-error" />
+		</on-error-propagate>
+		<on-error-propagate type="ANY" logException="true" enableNotifications="true">
+			<choice>
+				<when expression="#[error.errorType.namespace == 'APIKIT']">
+					<choice>
+						<when expression="#[error.errorType.identifier == 'BAD_REQUEST']">
+							<set-variable variableName="httpStatus" value="400" doc:name="HTTP Status = 400" />
+						</when>
+						<when expression="#[error.errorType.identifier == 'NOT_FOUND']">
+							<set-variable variableName="httpStatus" value="404" doc:name="HTTP Status = 404" />
+						</when>
+						<when expression="#[error.errorType.identifier == 'METHOD_NOT_ALLOWED']">
+							<set-variable variableName="httpStatus" value="405" doc:name="HTTP Status = 405" />
+						</when>
+						<when expression="#[error.errorType.identifier == 'NOT_ACCEPTABLE']">
+							<set-variable variableName="httpStatus" value="406" doc:name="HTTP Status = 406" />
+						</when>
+						<when expression="#[error.errorType.identifier == 'UNSUPPORTED_MEDIA_TYPE']">
+							<set-variable variableName="httpStatus" value="415" doc:name="HTTP Status = 415" />
+						</when>
+						<when expression="#[error.errorType.identifier == 'NOT_IMPLEMENTED']">
+							<set-variable variableName="httpStatus" value="501" doc:name="HTTP Status = 501" />
+						</when>
+					</choice>
+				</when>
+				<otherwise>
+					<set-variable variableName="httpStatus" value="500" doc:name="HTTP Status = 500" />
+				</otherwise>
+			</choice>
+			<flow-ref name="handle-private-error" doc:name="handle-private-error" />
+		</on-error-propagate>
+	</error-handler>
+
+	<sub-flow name="handle-private-error">
+		<tracing:set-logging-variable doc:name="Set Error Type" doc:id="ecbfe483-6adb-4953-8134-6d8a8966c043" variableName="errorType" value="#[error.errorType.namespace ++ ':' ++ error.errorType.identifier]"/>
+		<logger level="ERROR" doc:name="Logger" doc:id="ed8419c1-85f7-4c61-afd1-c33125eab0f7" message="#[error.description]" />
+		<tracing:remove-logging-variable doc:name="Remove Error Type" doc:id="c999fc73-c768-4717-9392-3a5601ace7a1" variableName="errorType"/>
+		<ee:transform doc:name="Private Client Error Response" doc:id="668d31d8-d694-4657-98ca-778df18c5c1b">
+			<ee:message>
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "correlationId": correlationId,
+  "type": error.errorType.namespace ++ ":" ++ error.errorType.identifier,
+  "message": error.description
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	
+</mule>

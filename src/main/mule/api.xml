@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:sap="http://www.mulesoft.org/schema/mule/sap" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/sap http://www.mulesoft.org/schema/mule/sap/current/mule-sap.xsd">
+	<flow name="apiFlow" doc:id="75a00245-dd8a-41a3-9e46-19e698bd19fe" >
+		<sap:function-listener doc:name="Function listener" doc:id="dfda2d90-df95-41ab-a706-e5b3b0494f0e" gatewayHost="${na.sap.gateway.host}" gatewayService="${na.sap.gateway.service}" programID="${na.sap.rfc.program.id}" connectionCount="${na.sap.connection.count}" config-ref="${sap.config}"/>
+		<flow-ref doc:name="set-log-filters" doc:id="c5d3978c-1f59-4f36-8e26-d8de3d802dd7" name="set-log-filters"/>
+		<async doc:name="Async" doc:id="ee87b4c6-3f76-4f1f-a408-f9ccc0ab5a39" >
+			<flow-ref doc:name="implementationFlow" doc:id="065702a0-3bed-4f35-a213-a8fb03e05945" name="implementationFlow"/>
+		</async>
+		<error-handler ref="private-errorhandler" />
+	</flow>
+	<flow name="apiFlow1" doc:id="aee8561e-1ed1-4686-a667-3026b184bcd3" >
+		<sap:function-listener doc:name="Function listener" doc:id="1037868c-8398-4e72-9ceb-d5c3efe4095e" gatewayHost="${anz.sap.gateway.host}" gatewayService="${anz.sap.gateway.service}" programID="${anz.sap.rfc.program.id}" connectionCount="${anz.sap.connection.count}" config-ref="${sap.anz.config}"/>
+		<flow-ref doc:name="set-log-filters" doc:id="01a2ff80-f0e0-4bd6-9475-1a8e3f4687f0" name="set-log-filters"/>
+		<async doc:name="Async" doc:id="0300be02-ad8d-40cd-b739-85ebe63c6595" >
+			<flow-ref doc:name="implementationFlow" doc:id="c716e82f-ea38-4124-9e4a-b38327b2aba7" name="implementationFlow"/>
+		</async>
+		<error-handler ref="private-errorhandler" />
+	</flow>
+
+</mule>

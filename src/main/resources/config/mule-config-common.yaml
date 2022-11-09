@@ -1,0 +1,7 @@
+api:
+  artifactId: mule-common-services
+  version: 1.0.0
+    
+client:
+  error:
+    message: "Please contact your Mondelez Support and supply your Correlation ID"
