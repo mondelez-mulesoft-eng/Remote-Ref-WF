@@ -19,7 +19,7 @@ http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/sc
             <reconnection >
             <reconnect/>
             </reconnection>
-            <sap:message-server host="${UKI.sap.ms.host}" systemId="${UKI.sap.sid}" port="${UKI.sap.ms.port}" group="${UKI.sap.ms.group}" router="${UKI.sap.ms.router}" />
+            <sap:message-server host="#[${UKI.sap.ms.host}]" systemId="#[${UKI.sap.sid}]" port="#[${UKI.sap.ms.port}]" group="#[${UKI.sap.ms.group}]" router="#[${UKI.sap.ms.router}]" />
         </sap:simple-connection-provider-connection>
     </sap:sap-config>
 
