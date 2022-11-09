@@ -21,13 +21,13 @@ http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/sc
 		doc:name="secure-props-common"
 		doc:id="f6a0115d-5c9f-42a0-bcaf-78b1a63c80ab"
 		file="config/mule-config-common.yaml"
-		key="${encryption.key}" />
+		key="${mule.vault.key}" />
 	  
 	<secure-properties:config name="secure-props-env"
 		doc:name="secure-props-env"
 		doc:id="428cfacb-f4f6-4f9d-b895-3b8f367b1b3b"
 		file="config/mule-config-${mule.env}.yaml"
-		key="${encryption.key}" />
+		key="${mule.vault.key}" />
 
 	<!-- TLS Context -->
 	<tls:context name="api-listener-tls">
