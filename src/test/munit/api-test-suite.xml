@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="api-test-suite.xml" />
+	<munit:test name="api-test-suite-apiFlowTest" doc:id="676cd654-c96e-4590-8446-a9266885be61" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="e08491fe-556f-4bb5-b013-96b7162a7df3" processor="sap:function-listener">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Function listener" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="a5c9e380-9be8-4ea6-9e02-bc3b91871604" processor="anypoint-mq:publish">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Publish" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="dfe6b7c4-541c-4ba6-8f6d-22e63792e3ed" >
+				<munit:payload value='#[readUrl("classpath://rfc.xml","application/xml")]' />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to apiFlow" doc:id="bbe6e4a4-370b-4dc4-9104-20aa28a4c200" name="apiFlow"/>
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:verify-call doc:name="Verify call" doc:id="c5d35289-5b6b-43aa-be1e-774f38f0b0c4" processor="ee:transform" atLeast="#[1]">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="XML to JSON" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+			<munit-tools:sleep time="#[10]" doc:name="Sleep" doc:id="9e1f46d6-1970-4cb6-bd73-d32a7d8bef45" />
+		</munit:validation>
+	</munit:test>
+	<munit:test name="api-test-suite-apiFlowTest-Feedback" doc:id="c2f9fe56-7284-4c8f-8281-173249ee0761" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="479feee4-378a-426b-8320-7eeec7ec5a19" processor="sap:function-listener">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Function listener" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:spy doc:name="Spy" doc:id="d3e9c914-8edf-4f42-93ce-14c3246936a3" processor="ee:transform">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="cb278453-0fc3-4199-9d4b-959220bb6ad6" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="cb278453-0fc3-4199-9d4b-959220bb6ad6" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="cb278453-0fc3-4199-9d4b-959220bb6ad6" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="cb278453-0fc3-4199-9d4b-959220bb6ad6" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="cb278453-0fc3-4199-9d4b-959220bb6ad6" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:before-call >
+					<logger level="INFO" doc:name="Logger" doc:id="b3fcaa1b-f919-4abf-a18d-f2ee6fdfa6f9" message="Before mapping #[payload]"/>
+				</munit-tools:before-call>
+				<munit-tools:after-call >
+					<logger level="INFO" doc:name="Logger" doc:id="e662bf31-4d62-48c7-9185-f972706b6753" message="After mapping #[payload]"/>
+					<munit-tools:assert-equals doc:name="Assert equals" doc:id="5a564829-a6d6-482c-99f1-e9cab1c7e8ee" actual="#[payload]" expected='#[readUrl("classpath://rfc_off_op.json","application/json")]' message="Please check the mapping"/>
+				</munit-tools:after-call>
+			</munit-tools:spy>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="3f91442e-f1d6-4cd2-98af-edc559242986" processor="anypoint-mq:publish">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Publish" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="4a01ec04-2b8c-407f-8739-552d2e413cdc" >
+				<munit:payload value='#[readUrl("classpath://rfc_off.xml","application/xml")]' />
+			</munit:set-event>
+			<flow-ref doc:name="Flow Reference" doc:id="ab0b453d-43d0-4015-9ec1-d4e0a1a93a83" name="implementationFlow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:verify-call doc:name="Verify call" doc:id="a6c0393f-616b-48b2-b0df-b18e6dbf44d9" processor="ee:transform" atLeast="#[1]">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="XML to JSON" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+			<munit-tools:sleep time="10" doc:name="Sleep" doc:id="0d5cacae-2a05-4e29-9942-47ee88b8c741" timeUnit="SECONDS"/>
+		</munit:validation>
+	</munit:test>
+
+
+
+</mule>
