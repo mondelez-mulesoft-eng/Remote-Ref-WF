@@ -6,32 +6,21 @@
 http://www.mulesoft.org/schema/mule/sap http://www.mulesoft.org/schema/mule/sap/current/mule-sap.xsd
 http://www.mulesoft.org/schema/mule/anypoint-mq http://www.mulesoft.org/schema/mule/anypoint-mq/current/mule-anypoint-mq.xsd
 http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd">
-	<sap:sap-config name="NA_SAP_Config" doc:name="SAP Config" doc:id="4822813c-8f67-41d8-a59f-8a2b7e0095e3" >
-		<sap:simple-connection-provider-connection username="${sap.username}" password="${secure::sap.password}" systemNumber="${na.sap.system.number}" client="${na.sap.clientid}" applicationServerHost="${na.sap.application.server.host}" />
+	<sap:sap-config name="SAP_Config_UKI" doc:name="SAP Config" doc:id="4822813c-8f67-41d8-a59f-8a2b7e0095e3" >
+		<sap:simple-connection-provider-connection username="${UKI.sap.username}" password="${secure::UKI.sap.password}" systemNumber="${UKI.sap.system.number}" client="${UKI.sap.clientid}" applicationServerHost="${UKI.sap.application.server.host}" />
 	</sap:sap-config>
 	<anypoint-mq:config name="Anypoint_MQ_Config" doc:name="Anypoint MQ Config" doc:id="1e187544-a7de-48c0-8a88-64c271a8b508" >
-		<anypoint-mq:connection url="${can.mq.url}" clientId="${secure::can.mq.clientid}" clientSecret="${secure::can.mq.clientsecret}" />
-	</anypoint-mq:config>
-	<anypoint-mq:config name="Anypoint_MQ_Config_ANZ" doc:name="Anypoint MQ Config" doc:id="627bd72f-30b3-4a93-9116-13c67c8380ac" >
-		<anypoint-mq:connection url="${anz.mq.url}" clientId="${secure::anz.mq.clientid}" clientSecret="${secure::anz.mq.clientsecret}" />
+		<anypoint-mq:connection url="${UKI.mq.url}" clientId="${secure::UKI.mq.clientid}" clientSecret="${secure::UKI.mq.clientsecret}" />
 	</anypoint-mq:config>
 	<configuration-properties doc:name="Configuration properties" doc:id="cc1526e1-f979-4c0d-9b7a-19606b8302cb" file="properties/${mule.env}.properties" />
 	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="30772ba1-866b-4c66-ba12-3f355f5651a8" file="properties/secure/secure-${mule.env}.properties" key="${encryption.key}" />
-	<sap:sap-config name="SAP_Config_MS_NA" doc:name="SAP Config_MS_NA" doc:id="3c652ea6-8ca2-4a2f-ad90-5a372e1ca6ae" >
-        <sap:simple-connection-provider-connection username="${sap.username}" password="${secure::sap.password}" systemNumber="${na.sap.system.number}" client="${na.sap.clientid}">
+	<sap:sap-config name="SAP_Config_MS_UKI" doc:name="SAP Config_MS_NA" doc:id="3c652ea6-8ca2-4a2f-ad90-5a372e1ca6ae" >
+        <sap:simple-connection-provider-connection username="${UKI.sap.username}" password="${secure::UKI.sap.password}" systemNumber="${UKI.sap.system.number}" client="${UKI.sap.clientid}">
             <reconnection >
             <reconnect/>
             </reconnection>
-            <sap:message-server host="${sap.na.ms.host}" systemId="${sap.na.sid}" port="${sap.na.ms.port}" group="${sap.na.ms.group}" router="${sap.na.ms.router}" />
+            <sap:message-server host="${UKI.sap.ms.host}" systemId="${UKI.sap.sid}" port="${UKI.sap.ms.port}" group="${UKI.sap.ms.group}" router="${UKI.sap.ms.router}" />
         </sap:simple-connection-provider-connection>
     </sap:sap-config>
-	<sap:sap-config name="ANZ_SAP_Config" doc:name="SAP Config" doc:id="39647d43-d8f9-450b-a0e1-92162357cf19" >
-		<sap:simple-connection-provider-connection password="${secure::sap.password}" username="${anz.sap.username}" systemNumber="${anz.sap.system.number}" client="${anz.sap.client.id}" applicationServerHost="${anz.sap.application.server.host}"/>
-	</sap:sap-config>
-	<sap:sap-config name="SAP_Config_MS_ANZ" doc:name="SAP Config" doc:id="cd3df6cc-6ef7-4479-8d57-cafea785ecfe" >
-		<sap:simple-connection-provider-connection username="${anz.sap.username}" password="${secure::sap.password}" systemNumber="${anz.sap.system.number}" client="${anz.sap.client.id}">
-			<sap:message-server host="${sap.anz.ms.host}" systemId="${sap.anz.sid}" port="${sap.anz.ms.port}" group="${sap.anz.ms.group}" router="${sap.anz.ms.router}" />
-		</sap:simple-connection-provider-connection>
-	</sap:sap-config>
 
 </mule>

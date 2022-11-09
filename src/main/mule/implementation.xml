@@ -20,150 +20,18 @@ output application/json indent=false, duplicateKeyAsArray=true
 			</ee:message>
 		</ee:transform>
 		<choice doc:name="Choice" doc:id="85168224-0b77-42e2-86f5-ed5ee3652997" >
-			<when expression='#[payload.id == "YSTCO_I400168_DEDUCTION_OB_RFC"]'>
-				<ee:transform doc:name="Set array" doc:id="30269827-e5bd-4612-ae0a-987d9e04b94b">
-					<ee:message>
-						<ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-if (payload.message.YSTCO_I400168_DEDUCTION_OB_RFC."import"."IMT_DEDUCTION".row is Array)
-    payload.message.YSTCO_I400168_DEDUCTION_OB_RFC."import"."IMT_DEDUCTION".row
-else
-    [
-payload.message.YSTCO_I400168_DEDUCTION_OB_RFC."import"."IMT_DEDUCTION".row
-    ]]]></ee:set-payload>
-					</ee:message>
-				</ee:transform>
-				<batch:job jobName="Batch1" doc:id="22ebda84-92cd-4bb5-92d3-5babd65ebb91" blockSize="${batch.size}" maxFailedRecords="${batchMaxFailedRecords}" jobInstanceId="#['YSTCO_I400168_DEDUCTION_OB_RFC Batch Job From ' ++ now() as String {format: 'dd/MM/yy hh:mm:ss:SSS'} ++ (randomInt(99) as String)]">
-					<batch:process-records >
-						<batch:step name="Batch_Step_1" doc:id="67093b6b-6c1e-42d9-bc90-4ef6afa73182" >
-							<batch:aggregator doc:name="Batch Aggregator" doc:id="e5631d92-badc-4a91-9235-557f91487ef0" size="${aggregator.size}" preserveMimeTypes="true">
-								<ee:transform doc:name="create payload" doc:id="4c9d59e6-885d-49bd-b587-5b450e42e18e">
-					<ee:message>
-						<ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-payload map{
-	"headers": {
-		"x-mdlz-source-system": "SAP_ERP",
-		"x-mdlz-source-system-id": p('na.sap.sid') ++ "CLNT" ++ p('na.sap.clientid'),
-		"x-mdlz-source-system-region": "NA"
-	},
-	"paymentType": "deduction",
-	"paymentCode": "",
-	"salesOrg": $.'YYSALES_ORG',
-	"extSalesOrg": "",
-	"disputeCase": $.'EXT_KEY',
-	"payer": $.'FIN_KUNNR',
-	"soldTo": $.'YYSHIP_TO',
-	"date": $.'YYDISP_DATE',
-	"amount": $.'FIN_DISPUTED_AMT',
-	"prodCategory": $.YYPRDCA,
-	"checkNumber": "",
-	"itemText": $.'YYLINEITEM_TXT',
-	"invoiceNo": if ( isEmpty($.'YYINVOICE_NUMBER') ) ("NA") else ($.'YYINVOICE_NUMBER'),
-	"notes": $.'SGTXT',
-	"status": $.'STAT_ORDERNO',
-	(if ( $.'YYHYPERLINK'.row is Array ) ("extReferences": ($.'YYHYPERLINK'.row map(v,i) ->{
-		"url": v,
-		"name": $.'EXT_REF',
-		"paymentName": ""
-	})default []) 
-    else ("extReferences": [{
-		"url": $.'YYHYPERLINK'.row,
-		"name": $.'EXT_REF',
-		"paymentName": ""
-	}]default []))
-}]]></ee:set-payload>
-					</ee:message>
-				</ee:transform>
-								<anypoint-mq:publish doc:name="Publish" doc:id="b743f7b5-0c19-4ed1-8e12-fcc528cf08e0" config-ref="Anypoint_MQ_Config" destination="${can.mq.YSTCO_I400168_DEDUCTION_OB_RFC}" />
-							</batch:aggregator>
-						</batch:step>
-						<batch:step name="Batch_Step_2" doc:id="74b504aa-cb1e-4d86-8522-5e4cade1f4f5" acceptPolicy="ONLY_FAILURES">
-							<batch:aggregator doc:name="Batch Aggregator" doc:id="2ac5fbd9-15f5-4ace-a19f-492729750ca4" size="${aggregator.size}" preserveMimeTypes="true">
-								<logger level="INFO" doc:name="Failure Logger" doc:id="20200c63-020f-4c79-bd1e-e0428cf8cf53" message="=====Failed records: #[payload] ======"/>
-							</batch:aggregator>
-						</batch:step>
-					</batch:process-records>
-				</batch:job>
-			</when>
-			<when expression='#[payload.id == "YOTCO_I011222_SWEEP_TOL"]'>
-				<ee:transform doc:name="Transform Message" doc:id="7711b85e-8927-4de0-a6f6-6f004ed59d93" >
-					<ee:message >
-						<ee:set-payload ><![CDATA[%dw 2.0
-output application/json
----
-if (payload.message.YOTCO_I011222_SWEEP_TOL."import".IMT_SWEEP_TOL.row is Array)
-    payload.message.YOTCO_I011222_SWEEP_TOL."import".IMT_SWEEP_TOL.row
-else
-    [
-        payload.message.YOTCO_I011222_SWEEP_TOL."import".IMT_SWEEP_TOL.row
-    ]]]></ee:set-payload>
-					</ee:message>
-				</ee:transform>
-				<batch:job jobName="Batch2" doc:id="ddce1523-59db-460d-98f4-d2f2e961d79b" blockSize="${batch.size}" maxFailedRecords="${batchMaxFailedRecords}" jobInstanceId="#['YOTCO_I011222_SWEEP_TOL Batch Job From ' ++ now() as String {format: 'dd/MM/yy hh:mm:ss:SSS'} ++ (randomInt(99) as String)]">
-					<batch:process-records>
-						<batch:step name="Batch_Step_1" doc:id="4029d523-3ef9-48f4-8c23-f1ba48b84453">
-							<batch:aggregator doc:name="Batch Aggregator" doc:id="86b73ab2-4b8d-42b3-9dc3-cbb17c23d9f3" size="${aggregator.size}" preserveMimeTypes="true">
-								<ee:transform doc:name="create payload" doc:id="f4e97eb1-b4dc-449b-9010-bd2920caf0d6">
-					<ee:message>
-						<ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-payload map{
-	"headers":{
-		"x-mdlz-source-system": "SAP_ERP",
-		"x-mdlz-source-system-id": p('na.sap.sid') ++ "CLNT" ++ p('na.sap.clientid'),
-		"x-mdlz-source-system-region": "NA"
-	},
-	"paymentType": "write-off",
-	"paymentCode": $.'OBJECT_ID',
-	"salesOrg": $.'SALES_ORG',
-	"extSalesOrg": "",
-	"disputeCase": $.'EXT_KEY',
-	"payer": $.PAYER,
-	"soldTo": $.'PLANNING_CUST',
-	"date": $.'POSTING_DATE',
-	"amount": $.'WRITE_OFF_AMT',
-	"prodCategory":$.'TERR_ID',
-	"checkNumber": "",
-	"itemText": $.SGTXT,
-	"invoiceNo": $.BELNR,
-	"notes": "",
-	"status": "",
-	"toleranceGroup": $.'TRANS_TYP',
-	"extReferences":{
-		"url": "",
-		"name": "",
-		"paymentName": ""
-	}
-}]]></ee:set-payload>
-					</ee:message>
-				</ee:transform>
-								<anypoint-mq:publish doc:name="Publish" doc:id="0089b217-4aec-4848-b67d-c740a6b10675" config-ref="Anypoint_MQ_Config" destination="${can.mq.YOTCO_I011222_SWEEP_TOL}" />
-							</batch:aggregator>
-						</batch:step>
-						<batch:step name="Batch_Step_2" doc:id="4027aba0-fc2d-4b11-b828-18aade1e5a29" acceptPolicy="ONLY_FAILURES">
-							<batch:aggregator doc:name="Batch Aggregator" doc:id="d3e8e0bc-d8dc-42b3-8bf7-43b114b4516e" size="${aggregator.size}" preserveMimeTypes="true">
-								<logger level="INFO" doc:name="Failure Logger" doc:id="364a3e0d-1793-45db-94da-0cfc84c1def6" message="=====Failed records: #[payload] ======" />
-							</batch:aggregator>
-						</batch:step>
-					</batch:process-records>
-				</batch:job>
-			</when>
-			<when expression='#[payload.id == "YOTC_I11223_FEEDBACK"]'>
+			<when expression='#[payload.id == "ZOTC_I11223_FEEDBACK"]'>
 				<ee:transform doc:name="Transform Message" doc:id="424fc505-8c18-45c5-bc4d-e3d48fbff1b1" >
 					<ee:message >
 						<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
 ---
-if (payload.message.YOTC_I11223_FEEDBACK."import".PI_FEEDBACK.row is Array
+if (payload.message.ZOTC_I11223_FEEDBACK."import".PI_FEEDBACK.row is Array
 )
-    payload.message.YOTC_I11223_FEEDBACK."import".PI_FEEDBACK.row
+    payload.message.ZOTC_I11223_FEEDBACK."import".PI_FEEDBACK.row
 else
     [
-        payload.message.YOTC_I11223_FEEDBACK."import".PI_FEEDBACK.row
+        payload.message.ZOTC_I11223_FEEDBACK."import".PI_FEEDBACK.row
     ]]]></ee:set-payload>
 					</ee:message>
 				</ee:transform>
@@ -181,8 +49,8 @@ output application/json
 payload map{
 	"headers":{
 		"x-mdlz-source-system": "SAP_ERP",
-		"x-mdlz-source-system-id": p('na.sap.sid') ++ "CLNT" ++ p('na.sap.clientid'),
-		"x-mdlz-source-system-region": "NA"
+		"x-mdlz-source-system-id": p('UKI.sap.sid') ++ "CLNT" ++ p('UKI.sap.clientid'),
+		"x-mdlz-source-system-region": "UKI"
 	},
 	"paymentType": "feedback",
 	"paymentId": $."UNIQUE_ID",
@@ -193,112 +61,12 @@ payload map{
 }]]></ee:set-payload>
 					</ee:message>
 				</ee:transform>
-								<anypoint-mq:publish doc:name="Publish" doc:id="21e79778-2243-4b8c-bbb6-e06a44e09a3c" config-ref="Anypoint_MQ_Config" destination="${can.mq.YOTC_I11223_FEEDBACK}" />
+								<anypoint-mq:publish doc:name="Publish" doc:id="21e79778-2243-4b8c-bbb6-e06a44e09a3c" config-ref="Anypoint_MQ_Config" destination="${UKI.mq.ZOTC_I11223_FEEDBACK}" />
 							</batch:aggregator>
 						</batch:step>
 						<batch:step name="Batch_Step_2" doc:id="793af7ac-78c4-421a-b9e2-3a2a1ae29f6f" acceptPolicy="ONLY_FAILURES">
 							<batch:aggregator doc:name="Batch Aggregator" doc:id="aaa9fd28-77dc-43cb-842c-9ad982c3c297" size="${aggregator.size}" preserveMimeTypes="true">
 								<logger level="INFO" doc:name="Failure Logger" doc:id="70bdb85f-2efb-49e2-a058-f7879819b025" message="=====Failed records: #[payload] ======" />
-							</batch:aggregator>
-						</batch:step>
-					</batch:process-records>
-				</batch:job>
-			</when>
-			<when expression='#[payload.id == "YSTPO_I200242_PMNT_CLR_ACK"]'>
-				<ee:transform doc:name="Transform Message" doc:id="027e7bbc-e5e7-458b-9a6b-1637e17b737a" >
-					<ee:message >
-						<ee:set-payload ><![CDATA[%dw 2.0
-output application/json
----
-if ( payload.YSTPO_I200242_PMNT_CLR_ACK."import".IT_DATA.row is Array ) payload.YSTPO_I200242_PMNT_CLR_ACK."import".IT_DATA.row
-else
-    [payload.YSTPO_I200242_PMNT_CLR_ACK."import".IT_DATA.row]]]></ee:set-payload>
-					</ee:message>
-				</ee:transform>
-				<batch:job jobName="Batch4" doc:id="537fa2a9-a39c-4080-97dd-c18c39aa99cf" blockSize="${batch.size}" maxFailedRecords="${batchMaxFailedRecords}" jobInstanceId="#['YSTPO_I200242_PMNT_CLR_AC Batch Job From ' ++ now() as String {format: 'dd/MM/yy hh:mm:ss:SSS'} ++ (randomInt(99) as String)]">
-					<batch:process-records>
-						<batch:step name="Batch_Step_1" doc:id="ee84ae1a-60d6-4b26-b451-416e87b5ceb4">
-							<batch:aggregator doc:name="Batch Aggregator" doc:id="7a2f6782-f9ee-4478-9214-d8b4ad600ea5" size="${aggregator.size}" preserveMimeTypes="true">
-								<ee:transform doc:name="create payload" doc:id="44b5f7b1-c180-4d13-9792-816bef82bd55">
-					<ee:message>
-						<ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-payload map{
-	"headers": {
-		"x-mdlz-source-system": "SAP_ERP",
-		"x-mdlz-source-system-id": p('na.sap.sid') ++ "CLNT" ++ p('na.sap.clientid'),
-		"x-mdlz-source-system-region": "NA"
-	},
-	"paymentType": "clearing",
-	"paymentId": $.VBLNR,
-	"referenceNo": $.BELNR,
-	"printDate": $.PRIDT,
-	"extMessage": "Success",
-	"encashmentDate": $.BANCD,
-	"checkNumber": $.CHECT
-}]]></ee:set-payload>
-					</ee:message>
-				</ee:transform>
-								<anypoint-mq:publish doc:name="Publish" doc:id="68001447-b591-43ab-af47-03cbd2b0aca2" config-ref="Anypoint_MQ_Config" destination="${can.mq.YSTPO_I200242_PMNT_CLR_AC}" />
-							</batch:aggregator>
-						</batch:step>
-						<batch:step name="Batch_Step_2" doc:id="a102249b-1a73-4827-b1d6-294d15d28c68">
-							<batch:aggregator doc:name="Batch Aggregator" doc:id="4ce20540-c258-47a0-abd2-b31e33c0130b" size="${aggregator.size}" preserveMimeTypes="true">
-								<logger level="INFO" doc:name="Failure Logger" doc:id="860e09a5-da5b-4bff-8927-711faf1210d4" message="=====Failed records: #[payload] ======" />
-							</batch:aggregator>
-						</batch:step>
-					</batch:process-records>
-				</batch:job>
-			</when>
-			<when expression='#[payload.id == "ZOTC_I11223_FEEDBACK"]'>
-				<ee:transform doc:name="Set array" doc:id="982da79e-25c3-4015-97ff-5d55476cd964" >
-					<ee:message >
-						<ee:set-payload ><![CDATA[%dw 2.0
-output application/json
----
-if (payload.message..row is Array)
-    flatten(payload.message..row)
-else
-    [
-        payload.message..row
-    ]]]></ee:set-payload>
-					</ee:message>
-				</ee:transform>
-				<logger level="INFO" doc:name="Logger" doc:id="1ec44de6-5e90-465f-91ea-107900599d60" message="#[payload]"/>
-				
-				<batch:job jobName="Batch5" doc:id="b565bf9b-3bf3-4b65-99ff-d8db49a1c916" maxFailedRecords="${batchMaxFailedRecords}" jobInstanceId="#['OFFINVOICE_FEEDBACK Batch Job From ' ++ now() as String {format: 'dd/MM/yy hh:mm:ss:SSS'} ++ (randomInt(99) as String)]" blockSize="${batch.size}">
-					<batch:process-records >
-						<batch:step name="Batch_Step_1" doc:id="348b4598-ed14-450b-8f89-33b5876d40e0" >
-							<batch:aggregator doc:name="Batch Aggregator" doc:id="1dbad5a3-82a9-4de0-a319-8d34b5be755b" size="${aggregator.size}" preserveMimeTypes="true">
-								<ee:transform doc:name="create payload" doc:id="cb278453-0fc3-4199-9d4b-959220bb6ad6" >
-									<ee:message >
-										<ee:set-payload ><![CDATA[%dw 2.0
-output application/json
----
-payload map{
-	"headers":{
-		"x-mdlz-source-system": "SAP_ERP",
-		"x-mdlz-source-system-id": p('anz.sap.sid') ++ "CLNT" ++ p('anz.sap.client.id'),
-		"x-mdlz-source-system-region": "ANZ"
-	},
-	"tacticId": $.'UNIQUE_ID',
-	"salesDealID": $.'DOC_NO',
-	"status": $.STATUS,
-	"salesOrg": $.'SALES_ORG',
-	"rebateAggrementId": $.'DOC_NO',
-	"erpRespDate": $.'DOC_DATE' as DateTime { format: "eee MMM dd HH:mm:ss zz yyyy" } as String  {format: "yyyy-MM-dd"},
-	"errorMessage": $.MESSAGE,
-	"docType": $.'DOC_TYPE'
-}]]></ee:set-payload>
-									</ee:message>
-								</ee:transform>
-								<anypoint-mq:publish doc:name="Publish" doc:id="b5b807fc-3882-4921-8607-7d05ac7ced4e" config-ref="Anypoint_MQ_Config_ANZ" destination="${anz.mq.ZOTC_I11223_FEEDBACK}"/>
-							</batch:aggregator>
-						</batch:step>
-						<batch:step name="Batch_Step_2" doc:id="c6ed773c-f1b5-4840-a550-2174f374243b" >
-							<batch:aggregator doc:name="Batch Aggregator" doc:id="f2077c3f-b829-41eb-a2ea-b471cf8d09ed" size="${aggregator.size}" preserveMimeTypes="true">
-								<logger level="INFO" doc:name="failure Logger" doc:id="2894deeb-4005-40d6-a19f-ebb1d9eee7fe" message="=====Failed records: #[payload] ======"/>
 							</batch:aggregator>
 						</batch:step>
 					</batch:process-records>
