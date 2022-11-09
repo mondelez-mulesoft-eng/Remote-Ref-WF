@@ -5,6 +5,9 @@
 
 # Package Files #
 *.jar
+!sapidoc3.jar
+!sapjco3.jar
+
 *.war
 *.ear
 
