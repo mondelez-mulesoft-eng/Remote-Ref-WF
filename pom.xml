@@ -2,9 +2,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>com.mdlz.api</groupId>
-		<artifactId>mule-sap-parent-pom</artifactId>
-		<version>1.0.0</version>
+		<groupId>905c6ea1-68d6-417c-a056-de0944741f75</groupId>
+		<artifactId>pom-parent</artifactId>
+		<version>0.0.7</version>
 	</parent>
 	<groupId>com.mdlz.integrationservices</groupId>
 	<artifactId>sap-sales-payments-exp-v1</artifactId>
