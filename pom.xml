@@ -3,8 +3,8 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>905c6ea1-68d6-417c-a056-de0944741f75</groupId>
-		<artifactId>pom-parent</artifactId>
-		<version>0.0.4</version>
+		<artifactId>mule-sap-parent-pom</artifactId>
+		<version>1.0.0</version>
 	</parent>
 	<groupId>com.mdlz.integrationservices</groupId>
 	<artifactId>sap-sales-payments-exp-v1</artifactId>
