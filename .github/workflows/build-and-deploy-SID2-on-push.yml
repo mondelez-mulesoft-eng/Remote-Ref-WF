@@ -1,4 +1,4 @@
-name: Build and Deploy to Cloud Hub
+name: Build 2nd SAP SID and Deploy to Cloud Hub
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     
 jobs:
       
-  eu-build-and-deploy:
+  eu-EAS-build-and-deploy:
     uses: mondelez-mulesoft-eng/common-scripts/.github/workflows/workflow_integrationservices.yml@develop
     with:
       region: eu-central-1
