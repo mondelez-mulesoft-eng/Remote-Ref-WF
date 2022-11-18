@@ -1,5 +1,5 @@
 name: Build and Deploy to Cloud Hub
-include: '/workflows/workflow_integrationservices.yml'
+
 on:
   push:
     branches: [develop]
@@ -8,7 +8,8 @@ on:
 jobs:
       
   eu-dev-EEB-build-and-deploy:
-    uses: workflow_integrationservices.yml
+    call-workflow-in-local-repo:
+      uses: ./.github/workflows/workflow_integrationservices.yml
     with:
       region: eu-central-1
       workers: 1
