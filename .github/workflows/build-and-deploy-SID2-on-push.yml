@@ -1,4 +1,5 @@
 name: Build 2nd SAP SID and Deploy to Cloud Hub
+include: '/workflows/workflow_integrationservices.yml'
 
 on:
   push:
