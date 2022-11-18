@@ -1,5 +1,5 @@
 name: Build and Deploy to Cloud Hub
-
+include: '/workflows/workflow_integrationservices.yml'
 on:
   push:
     branches: [develop]
