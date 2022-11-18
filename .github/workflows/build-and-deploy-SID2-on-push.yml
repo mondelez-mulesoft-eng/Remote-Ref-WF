@@ -2,17 +2,18 @@ name: Build 2nd SAP SID and Deploy to Cloud Hub
 
 on:
   push:
-    branches: [main]
+    branches: [develop]
   workflow_dispatch:
     
 jobs:
       
-  eu-EAS-build-and-deploy:
-    uses: mondelez-mulesoft-eng/common-scripts/.github/workflows/workflow_integrationservices.yml@develop
+  eu-dev-EES-build-and-deploy:
+    uses: workflow_integrationservices.yml@develop
     with:
       region: eu-central-1
       workers: 1
       worker_type: MICRO
+      sid: EES
     secrets:
       "mule_nexus_username": ${{ secrets.mule_nexus_username }}
       "mule_nexus_password": ${{ secrets.mule_nexus_password }}
