@@ -1,0 +1,362 @@
+name: workflow_integrationservices.yml
+
+# Controls when the workflow will run
+on:
+  workflow_call:
+    inputs:
+      region:
+        required: true
+        type: string
+        default: us-east-2
+      workers:
+        required: true
+        type: number
+        default: 1
+      worker_type:
+        required: true
+        type: string
+        default: MICRO
+      sid:
+        required: true
+        type: string
+        default: EEB        
+    secrets:
+      MULE_NEXUS_USERNAME:
+        required: true    
+      MULE_NEXUS_PASSWORD:
+        required: true
+      connected_app_client_id:
+        required: true
+      connected_app_client_secret:
+        required: true
+      connected_app_granttype:
+        required: true
+      mule_env_dev_id:
+        required: true
+      mule_env_dev_secret:
+        required: true
+      decryption_key:
+        required: true
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  build-and-deploy:
+    #if: github.ref_name == 'develop'
+    runs-on: ubuntu-latest
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    env:
+      INTSERV_BUSINESS_GROUP_ID: f49b1442-156c-4c80-9cbc-12c7ce818bc6
+      WORKERS: ${{ inputs.workers }}
+      WORKER_TYPE: ${{ inputs.worker_type }}
+      REGION: ${{ inputs.region }}
+      MULE_VERSION: 4.4.0
+      SID: ${{inputs.sid}}
+      SKIP_DEPLOYMENT_VERIFICATION: false
+      
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/cache@v1
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
+      
+      run: echo "APPLICATION_NAME=mdlz-eudv-${{env.SID}}
+      
+    - name: Set anypoint deployment environment as Dev
+      run: echo "MULE_ENV=Dev" >> $GITHUB_ENV
+      if: github.ref_name == 'develop'
+      
+    - name: Set anypoint deployment environment as Test
+      run: echo "MULE_ENV=Test" >> $GITHUB_ENV
+      if: github.ref_name == 'test'
+
+    - name: Set anypoint deployment environment as QA
+      run: echo "MULE_ENV=QA" >> $GITHUB_ENV
+      if: github.ref_name == 'release'
+
+    - name: Set anypoint deployment environment as Prod
+      run: echo "MULE_ENV=Prod" >> $GITHUB_ENV
+      if: github.ref_name == 'main'
+
+    - name: Set app environment for dev properties
+      run: echo "APP_ENV=dev" >> $GITHUB_ENV
+      if: github.ref_name == 'develop'
+
+    - name: Set app environment for test properties
+      run: echo "APP_ENV=test" >> $GITHUB_ENV
+      if: github.ref_name == 'test'
+
+    - name: Set app environment for qa properties
+      run: echo "APP_ENV=qa" >> $GITHUB_ENV
+      if: github.ref_name == 'release'
+
+    - name: Set app environment for prod properties
+      run: echo "APP_ENV=prod" >> $GITHUB_ENV
+      if: github.ref_name == 'main'
+
+    - name: Set AP application name for Dev env
+      run: echo "APPLICATION_NAME=mdlz-apdv-${{env.SID}}-${{ github.event.repository.name }}" >> $GITHUB_ENV
+      if: ${{ inputs.REGION == 'ap-southeast-1' && github.ref_name == 'develop' }}
+
+    - name: Set EU application name for Dev env
+      run: echo "APPLICATION_NAME=mdlz-eudv-${{env.SID}}-${{ github.event.repository.name }}" >> $GITHUB_ENV
+      if: ${{ inputs.REGION == 'eu-central-1' && github.ref_name == 'develop' }}
+
+    - name: Set US application name for Dev env
+      run: echo "APPLICATION_NAME=mdlz-usdv-${{ github.event.repository.name }}" >> $GITHUB_ENV
+      if: ${{ inputs.REGION == 'us-east-2' && github.ref_name == 'develop' }}
+
+    - name: Set AP application name for Test env
+      run: echo "APPLICATION_NAME=mdlz-apts-${{ github.event.repository.name }}" >> $GITHUB_ENV
+      if: ${{ inputs.REGION == 'ap-southeast-1' && github.ref_name == 'test' }}
+
+    - name: Set EU application name for Test env
+      run: echo "APPLICATION_NAME=mdlz-euts-${{ github.event.repository.name }}" >> $GITHUB_ENV
+      if: ${{ inputs.REGION == 'eu-central-1' && github.ref_name == 'test' }}
+
+    - name: Set US application name for Test env
+      run: echo "APPLICATION_NAME=mdlz-usts-${{ github.event.repository.name }}" >> $GITHUB_ENV
+      if: ${{ inputs.REGION == 'us-east-2' && github.ref_name == 'test' }}
+
+    - name: Set AP application name for QA env
+      run: echo "APPLICATION_NAME=mdlz-apqa-${{ github.event.repository.name }}" >> $GITHUB_ENV
+      if: ${{ inputs.REGION == 'ap-southeast-1' && github.ref_name == 'release' }}
+
+    - name: Set EU application name for QA env
+      run: echo "APPLICATION_NAME=mdlz-euqa-${{ github.event.repository.name }}" >> $GITHUB_ENV
+      if: ${{ inputs.REGION == 'eu-central-1' && github.ref_name == 'release' }}
+
+    - name: Set US application name for QA env
+      run: echo "APPLICATION_NAME=mdlz-usqa-${{ github.event.repository.name }}" >> $GITHUB_ENV
+      if: ${{ inputs.REGION == 'us-east-2' && github.ref_name == 'release' }}
+
+    - name: Set AP application name for Prod env
+      run: echo "APPLICATION_NAME=mdlz-ap-${{ github.event.repository.name }}" >> $GITHUB_ENV
+      if: ${{ inputs.REGION == 'ap-southeast-1' && github.ref_name == 'main' }}
+
+    - name: Set EU application name for Prod env
+      run: echo "APPLICATION_NAME=mdlz-eu-${{ github.event.repository.name }}" >> $GITHUB_ENV
+      if: ${{ inputs.REGION == 'eu-central-1' && github.ref_name == 'main' }}
+
+    - name: Set US application name for Prod env
+      run: echo "APPLICATION_NAME=mdlz-us-${{ github.event.repository.name }}" >> $GITHUB_ENV
+      if: ${{ inputs.REGION == 'us-east-2' && github.ref_name == 'main' }}
+
+    - name: Set mule.region environment property for AP application
+      run: echo "MULE_REGION=ap" >> $GITHUB_ENV
+      if: ${{ inputs.REGION == 'ap-southeast-1' }}
+
+    - name: Set mule.region environment property for EU application
+      run: echo "MULE_REGION=eu" >> $GITHUB_ENV
+      if: ${{ inputs.REGION == 'eu-central-1' }}
+
+    - name: Set mule.region environment property for US application
+      run: echo "MULE_REGION=us" >> $GITHUB_ENV
+      if: ${{ inputs.REGION == 'us-east-2' }}
+
+    - name: Dump github context
+      run:   echo "$GITHUB_CONTEXT"
+    
+    - name: Set up JDK 1.8
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+    
+    - name: maven-settings-xml-action
+      uses: whelk-io/maven-settings-xml-action@v20
+      with:
+        repositories: >
+          [
+            {
+              "id": "maven-central",
+              "name": "Maven Central Repository",
+              "url": "https://repo1.maven.org/maven2/",
+              "layout": "default",
+              "releases": {
+                "enabled": true
+              },
+              "snapshots": {
+                "enabled": true
+              }
+            },
+            {
+              "id": "mulesoft-releases",
+              "name": "MuleSoft Releases Repository",
+              "url": "https://repository.mulesoft.org/releases/",
+              "layout": "default",
+              "releases": {
+                "enabled": true
+              },
+              "snapshots": {
+                "enabled": true
+              }
+            },
+            {
+              "id": "mulesoft-releases-ee",
+              "name": "MuleSoft Enterprise Releases Repository",
+              "url": "https://repository.mulesoft.org/nexus-ee/content/repositories/releases-ee/",
+              "layout": "default",
+              "releases": {
+                "enabled": true
+              },
+              "snapshots": {
+                "enabled": true
+              }
+            },
+            {
+              "id": "mulesoft-public",
+              "name": "MuleSoft Public Repository",
+              "url": "https://repository.mulesoft.org/nexus/content/repositories/public",
+              "layout": "default",
+              "releases": {
+                "enabled": true
+              },
+              "snapshots": {
+                "enabled": false
+              }
+            },
+            {
+              "id": "anypoint-exchange-intserv",
+              "name": "anypoint.exchange.repository",
+              "url": "https://maven.anypoint.mulesoft.com/api/v2/organizations/f49b1442-156c-4c80-9cbc-12c7ce818bc6/maven/",
+              "layout": "default",
+              "releases": {
+                "enabled": true
+              },
+              "snapshots": {
+                "enabled": true
+              }
+            },
+            {
+              "id": "anypoint-exchange-v2",
+              "name": "anypoint.exchange.repository",
+              "url": "https://maven.anypoint.mulesoft.com/api/v2/organizations/905c6ea1-68d6-417c-a056-de0944741f75/maven/",
+              "layout": "default",
+              "releases": {
+                "enabled": true
+              },
+              "snapshots": {
+                "enabled": true
+              }
+            },
+            {
+              "id": "anypoint-exchange-v3",
+              "name": "Anypoint Exchange",
+              "url": "https://maven.anypoint.mulesoft.com/api/v3/organizations/905c6ea1-68d6-417c-a056-de0944741f75/maven/",
+              "layout": "default",
+              "releases": {
+                "enabled": true
+              },
+              "snapshots": {
+                "enabled": true
+              }
+            }
+          ]
+        plugin_repositories: >
+          [
+            {
+              "id": "mulesoft-releases",
+              "name": "mulesoft release repository",
+              "layout": "default",
+              "url": "https://repository.mulesoft.org/releases/",
+              "releases": {
+                "enabled": true
+              },
+              "snapshots": {
+                "enabled": false
+              }
+            },
+            {
+              "id": "mule-public",
+              "url": "https://repository.mulesoft.org/nexus/content/repositories/public"
+            }
+          ]
+        servers: >
+          [
+            {
+              "id": "Exchange",
+              "username": "~~~Client~~~",
+              "password": "${{ secrets.connected_app_client_id }}~?~${{ secrets.connected_app_client_secret }}"
+            },
+            {
+              "id": "ExchangeServer",
+              "username": "~~~Client~~~",
+              "password": "${{ secrets.connected_app_client_id }}~?~${{ secrets.connected_app_client_secret }}"
+            },
+            {
+              "id": "anypoint-exchange-intserv",
+              "username": "~~~Client~~~",
+              "password": "${{ secrets.connected_app_client_id }}~?~${{ secrets.connected_app_client_secret }}"
+            },
+            {
+              "id": "anypoint-exchange-v2",
+              "username": "~~~Client~~~",
+              "password": "${{ secrets.connected_app_client_id }}~?~${{ secrets.connected_app_client_secret }}"
+            },
+            {
+              "id": "anypoint-exchange-v3",
+              "username": "~~~Client~~~",
+              "password": "${{ secrets.connected_app_client_id }}~?~${{ secrets.connected_app_client_secret }}"
+            },
+            {
+              "id": "mulesoft-releases",
+              "username": "~~~Client~~~",
+              "password": "${{ secrets.connected_app_client_id }}~?~${{ secrets.connected_app_client_secret }}"
+            },
+            {
+              "id": "mulesoft-snapshots",
+              "username": "~~~Client~~~",
+              "password": "${{ secrets.connected_app_client_id }}~?~${{ secrets.connected_app_client_secret }}"
+            },
+            {
+              "id": "exchange-repository",
+              "username": "~~~Client~~~",
+              "password": "${{ secrets.connected_app_client_id }}~?~${{ secrets.connected_app_client_secret }}"
+            },
+            {
+              "id": "mulesoft-releases-ee",
+              "username": "${{ secrets.MULE_NEXUS_USERNAME }}",
+              "password": "${{ secrets.MULE_NEXUS_PASSWORD }}"
+            }
+          ]
+          
+    
+    - name: Check SAP jar files existence
+      id: check_files
+      uses: andstor/file-existence-action@v2
+      with:
+        files: "libs/libsapjco3.so, libs/sapidoc3.jar, libs/sapjco3.jar"
+        
+    - name: Install SAP maven dependencies
+      if: steps.check_files.outputs.files_exists == 'true'
+      # Only runs if all of the files exists
+      run: |
+        mvn -B -e install:install-file -DgroupId=com.sap.conn.idoc -DartifactId=com.sap.conn.idoc.sapidoc3 -Dversion=3.1.5 -Dpackaging=jar -Dfile=libs/sapidoc3.jar
+        mvn -B -e install:install-file -DgroupId=com.sap.conn.jco -DartifactId=com.sap.conn.jco.sapjco3 -Dversion=3.1.5 -Dpackaging=jar -Dfile=libs/sapjco3.jar
+        mvn -B -e install:install-file -DgroupId=com.sap.conn.jco -DartifactId=com.sap.conn.jco.libsapjco3 -Dversion=3.1.5 -Dpackaging=so -Dfile=libs/libsapjco3.so
+    
+    - name: Build
+      run: mvn -B clean package --file pom.xml -DskipMunitTests
+        
+    - name: Deploy to Cloud Hub 
+      run: |
+        artifactName=${{ env.APPLICATION_NAME }}
+        mvn -B -e deploy -DconnectedAppClientId=${{ secrets.connected_app_client_id }} \
+        -DconnectedAppClientSecret=${{ secrets.connected_app_client_secret }} \
+        -DconnectedAppGrantType=${{ secrets.connected_app_granttype }} \
+        -DbusinessGroupId=$INTSERV_BUSINESS_GROUP_ID \
+        -Dworkers=$WORKERS \
+        -DworkerType=$WORKER_TYPE \
+        -Dregion=$REGION \
+        -Denvironment=$MULE_ENV \
+        -Dmule.env=$APP_ENV \
+        -Dmule.region=$MULE_REGION \
+        -Dmule.vault.key=${{ secrets.decryption_key }} \
+        -DmuleVersion=$MULE_VERSION \
+        -Danypoint.platform.client_id=${{ secrets.mule_env_dev_id }} \
+        -Danypoint.platform.client_secret=${{ secrets.mule_env_dev_secret }} \
+        -DmuleDeploy -DapplicationName=${{ env.APPLICATION_NAME }} \
+        -DskipDeploymentVerification=$SKIP_DEPLOYMENT_VERIFICATION \
+        -DskipTests=true
