@@ -8,7 +8,7 @@ on:
 jobs:
       
   eu-dev-EEB-build-and-deploy:
-    uses: ./.github/workflows/workflow_integrationservices.yml@develop
+    uses: ./.github/workflows/workflow_integrationservices.yml
     with:
       region: eu-central-1
       workers: 1
