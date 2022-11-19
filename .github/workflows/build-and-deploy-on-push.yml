@@ -8,8 +8,7 @@ on:
 jobs:
       
   eu-dev-EEB-build-and-deploy:
-    call-workflow-in-local-repo:
-      uses: ./.github/workflows/workflow_integrationservices.yml@develop
+    uses: ./.github/workflows/workflow_integrationservices.yml@develop
     with:
       region: eu-central-1
       workers: 1
