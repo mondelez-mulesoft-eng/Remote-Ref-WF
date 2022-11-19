@@ -1,5 +1,5 @@
 name: Build 2nd SAP SID and Deploy to Cloud Hub
-include: '/workflows/workflow_integrationservices.yml'
+# include: '/workflows/workflow_integrationservices.yml'
 
 on:
   push:
@@ -9,7 +9,8 @@ on:
 jobs:
       
   eu-dev-EES-build-and-deploy:
-    uses: ./.github/workflows/workflow_integrationservices.yml
+    uses: mondelez-mulesoft-eng/common-scripts/.github/workflows/workflow_integrationservices.yml@develop
+   # uses: workflow_integrationservices.yml@develop
     with:
       region: eu-central-1
       workers: 1
