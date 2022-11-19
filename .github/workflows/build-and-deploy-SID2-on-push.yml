@@ -9,7 +9,7 @@ on:
 jobs:
       
   eu-dev-EES-build-and-deploy:
-    uses: workflow_integrationservices.yml@develop
+    uses: ./.github/workflows/workflow_integrationservices.yml
     with:
       region: eu-central-1
       workers: 1
