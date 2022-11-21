@@ -62,7 +62,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-maven-
       
-      run: echo "APPLICATION_NAME=mdlz-eudv-${{env.SID}}
+    #  run: echo "APPLICATION_NAME=mdlz-eudv-${{env.SID}}
       
     - name: Set anypoint deployment environment as Dev
       run: echo "MULE_ENV=Dev" >> $GITHUB_ENV
