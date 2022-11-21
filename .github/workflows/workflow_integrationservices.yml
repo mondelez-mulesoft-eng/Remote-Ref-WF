@@ -101,7 +101,7 @@ jobs:
       if: ${{ inputs.REGION == 'ap-southeast-1' && github.ref_name == 'develop' }}
 
     - name: Set EU application name for Dev env
-      run: echo "APPLICATION_NAME=mdlz-eudv-${{env.SID}}-${{ github.event.repository.name }}" >> $GITHUB_ENV
+      run: echo "APPLICATION_NAME=mdlz-eudv-${{inputs.sid}}-${{ github.event.repository.name }}" >> $GITHUB_ENV
       if: ${{ inputs.REGION == 'eu-central-1' && github.ref_name == 'develop' }}
 
     - name: Set US application name for Dev env
@@ -359,5 +359,6 @@ jobs:
         -Danypoint.platform.client_secret=${{ secrets.mule_env_dev_secret }} \
         -DmuleDeploy -DapplicationName=${{ env.APPLICATION_NAME }} \
         -DskipDeploymentVerification=$SKIP_DEPLOYMENT_VERIFICATION \
-        -DskipTests=true
-        -DobjectStoreV2=true
+        -DskipTests=true \
+        -DobjectStoreV2=true 
+        
