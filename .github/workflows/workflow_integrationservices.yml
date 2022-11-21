@@ -360,3 +360,4 @@ jobs:
         -DmuleDeploy -DapplicationName=${{ env.APPLICATION_NAME }} \
         -DskipDeploymentVerification=$SKIP_DEPLOYMENT_VERIFICATION \
         -DskipTests=true
+        -DobjectStoreV2=true
